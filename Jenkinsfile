@@ -5,7 +5,7 @@ node{
 		sh "${mvnCMD} clean package"
 	}
 	
-	stage('Build Docker Image){
+	stage('Build Docker Image'){
 		sh 'sudo docker build -t bona-fide-docker .'
 	}
 }
