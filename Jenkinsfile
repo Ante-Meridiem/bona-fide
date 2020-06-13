@@ -1,6 +1,6 @@
 node{
 	
 	stage('Build Docker Image'){
-		sh 'docker build -t bona-fide-docker .'
+		sh 'sudo docker build -f Dockerfile -t bona-fide-docker .'
 	}
 }
