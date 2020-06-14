@@ -1,8 +1,8 @@
 node{
-	stage('Scm Checkout'){
+	/*stage('Scm Checkout'){
 	   // git credentialsId: 'bona-fide', url: 'git@github.com:Ante-Meridiem/Bona-Fide.git'
 	   git branch: "${COMMIT_HASH}", credentialsId: 'bona-fide', url: 'git@github.com:Ante-Meridiem/Bona-Fide.git'
-	}
+	}*/
 	stage('Mvn Package'){
 	    def mvnHome = tool name: 'Maven', type: 'maven'
 	    def mvnCmd = "${mvnHome}/bin/mvn"
