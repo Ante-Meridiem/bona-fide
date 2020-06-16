@@ -13,7 +13,9 @@ node{
         	timeout(time: 30, unit: 'MINUTES') {
             		buildVersion = input(id: 'buildVersion', message: inputMessage, parameters: [
                     	[$class: 'TextParameterDefinition', defaultValue: '', description: 'buildVersion', name: 'desc']])
-            		echo "BuildVersion: ${buildVersion}"
+            		sh label: '', script: 'date +"%Y-%m-%d %T"'
+			echo "BuildVersion: ${buildVersion}"
+			echo "label: ${label}"
         	}
 	}
     	stage('Build Docker Image'){
