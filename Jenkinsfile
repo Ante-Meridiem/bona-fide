@@ -8,16 +8,27 @@ node{
 	    def mvnCmd = "${mvnHome}/bin/mvn"
 	    sh "${mvnCmd} clean package"
 	}
-    	stage('Build Docker Image'){
-		sh 'docker build -f Dockerfile -t talk2linojoy/bona-fide-docker .'
+	stage('Release Confirmation'){
+		def inputMessage = "Please Provide Release Version"
+        	timeout(time: 30, unit: 'MINUTES') {
+            		buildVersion = input(id: 'buildVersion', message: inputMessage, parameters: [
+                    	[$class: 'TextParameterDefinition', defaultValue: '', description: 'buildVersion', name: 'desc']])
+            		echo "BuildVersion: ${buildVersion}"
+        	}
 	}
-	stage('Push Docker'){
+    	stage('Build Docker Image'){
+		//sh 'docker build -f Dockerfile -t talk2linojoy/bona-fide-docker .'
+		sh "docker build -f Dockerfile -t talk2linojoy/${buildVersion} ."
+	}
+	stage('Push Docker Image'){
 		withCredentials([string(credentialsId: 'docker-hub-password', variable: 'dockerHubPassword')]) {
 			sh "docker login -u talk2linojoy -p ${dockerHubPassword}"	
 		}
-		sh 'docker push talk2linojoy/bona-fide-docker'
+		//sh 'docker push talk2linojoy/bona-fide-docker'
+		sh "docker push talk2linojoy/${buildVersion}"
 	}
 	stage('Run Docker Container'){
-		sh 'docker run -d -p 9002:9002 talk2linojoy/bona-fide-docker'
+		//sh 'docker run -d -p 9002:9002 --name BonaFideContainer talk2linojoy/bona-fide-docker'
+		sh "docker run -d -p 9002:9002 --name BonaFideContainer talk2linojoy/${buildVersion}"
 	}
 }
