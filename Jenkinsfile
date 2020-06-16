@@ -15,6 +15,7 @@ node{
 		withCredentials([string(credentialsId: 'docker-hub-password', variable: 'dockerHubPassword')]) {
 			sh "docker login -u talk2linojoy -p ${dockerHubPassword}"	
 		}
+		sh 'docker push talk2linojoy/bona-fide-docker'
 	}
 	stage('Run Docker Container'){
 		sh 'docker run -d -p 9002:9002 talk2linojoy/bona-fide-docker'
