@@ -26,7 +26,7 @@ node{
 	}
 	
 	stage('DOCKER CONTAINER RUN'){
-		sh "docker run -d -p 9002:9002 --name BFContainer/${buildVersion} talk2linojoy/${buildVersion}"
+		sh "docker run -d -p 9002:9002 --name BFContainer${buildVersion} talk2linojoy/${buildVersion}"
 	}
 }
 
