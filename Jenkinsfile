@@ -25,9 +25,28 @@ node{
 		sh "docker push talk2linojoy/${buildVersion}"
 	}
 	
-	stage('DOCKER CONTAINER RUN'){
-		sh "docker run -d -p 9002:9002 --name BFContainer${buildVersion} talk2linojoy/${buildVersion}"
+	stage('STOPPING CURRENT RUNNING CONTAINER'){
+		sh 'docker stop bona_fide_container'
+		sh 'docker rename bona_fide_container bona_fide_container_old
 	}
+	
+	stage('DOCKER CONTAINER RUN'){
+		sh "docker run -d -p 9002:9002 --name bona_fide_container talk2linojoy/${buildVersion}"
+	}
+	
+	stage('DOCKER CONTAINER HEALTH CHECK'){
+		script {
+                    final String url = 'http://ec2-13-235-2-41.ap-south-1.compute.amazonaws.com:9002/home'
+                    final String response = sh(script: "curl -Is $url | head -1", returnStdout: true).trim()
+			if(response == "HTTP/1.1 200"){
+				sh 'docker rm bona_fide_container_old'
+			}
+			else{
+				sh 'docker rm bona_fide_container'
+			}
+                }
+	}
+	
 }
 
 def getBuildVersion(){
