@@ -27,7 +27,7 @@ node{
 	
 	stage('STOPPING CURRENT RUNNING CONTAINER'){
 		sh 'docker stop bona_fide_container'
-		sh 'docker rename bona_fide_container bona_fide_container_old
+		sh 'docker rename bona_fide_container bona_fide_container_old'
 	}
 	
 	stage('DOCKER CONTAINER RUN'){
