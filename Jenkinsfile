@@ -25,13 +25,26 @@ node{
 		sh "docker push talk2linojoy/${buildVersion}"
 	}
 	
-	stage('STOPPING CURRENT RUNNING CONTAINER'){
-		sh 'docker stop bona_fide_container'
-		sh 'docker rename bona_fide_container bona_fide_container_old'
+	stage('STOPPING RUNNING CONTAINER'){
+		script{
+			final String currentImageId = sh(script: 'docker ps -q -f name=bona_fide_container',returnStdout: true)
+			if(currentImageId != null){
+				echo 'Stopping Current Container'
+				sh 'docker stop bona_fide_container'
+				echo 'Stopping Container : bona_fide_container'
+				echo 'Renaming Current Container'
+				sh 'docker rename bona_fide_container bona_fide_container_old'
+				echo 'Renamed bona_fide_container to bona_fide_container_old'
+			}
+		}
+		
 	}
 	
 	stage('DOCKER CONTAINER RUN'){
 		sh "docker run -d -p 9002:9002 --name bona_fide_container talk2linojoy/${buildVersion}"
+		echo 'Waiting for a minute...' 
+		sleep 59
+		
 	}
 	
 	stage('DOCKER CONTAINER HEALTH CHECK'){
@@ -39,10 +52,15 @@ node{
                     final String url = 'http://ec2-13-235-2-41.ap-south-1.compute.amazonaws.com:9002/home'
                     final String response = sh(script: "curl -Is $url | head -1", returnStdout: true).trim()
 			if(response == "HTTP/1.1 200"){
-				sh 'docker rm bona_fide_container_old'
+				final String dockerImageId = sh(script: 'docker ps -q -f name=bona_fide_container_old',returnStdout: true)  
+				if(dockerImageId != null){
+					sh 'docker rm bona_fide_container_old'
+					echo 'Successfully removed the previous container' 
+					echo "Deployment Successfull,Application Bona Fide is up and running in port 9002 with build version ${buildVersion}"
+				}
 			}
 			else{
-				sh 'docker rm bona_fide_container'
+				echo 'Deployment Unsuccessfull!!!'
 			}
                 }
 	}
