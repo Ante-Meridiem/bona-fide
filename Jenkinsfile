@@ -1,9 +1,10 @@
 node{
-	stage('CLEAN BUILD'){
+	//Ignoring the Build stage so as save the space
+	/*stage('CLEAN BUILD'){
 	    def mvnHome = tool name: 'Maven', type: 'maven'
 	    def mvnCmd = "${mvnHome}/bin/mvn"
 	    sh "${mvnCmd} clean package"
-	}
+	}*/
 	
 	stage('RELEASE CONFIRMATION'){
 		def inputMessage = "Please provide the RELEASE VERSION"
