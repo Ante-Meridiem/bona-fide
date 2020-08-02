@@ -19,12 +19,12 @@ node{
 		sh "docker build -f Dockerfile -t talk2linojoy/bona-fide/${buildVersion} ."
 	}
 	
-	stage('DOCKER IMAGE PUSH'){
+	/*stage('DOCKER IMAGE PUSH'){
 		withCredentials([string(credentialsId: 'docker-hub-password', variable: 'dockerHubPassword')]) {
 			sh "docker login -u talk2linojoy -p ${dockerHubPassword}"	
 		}
 		sh "docker push talk2linojoy/bona-fide/${buildVersion}"
-	}
+	}*/
 	
 	stage('STOPPING RUNNING CONTAINER'){
 		script{
