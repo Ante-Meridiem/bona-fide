@@ -28,7 +28,7 @@ node{
 	
 	stage('STOPPING RUNNING CONTAINER'){
 		script{
-			final String currentImageId = sh(script: 'docker ps -q --filter name="$containerNameWithRegularExpression" --filter status=running',returnStdout: true)
+			final String currentImageId = sh(script: 'docker ps -q --filter name="^bona_fide_container$" --filter status=running',returnStdout: true)
 			if(!currentImageId.isEmpty()){
 				echo 'Stopping Current Container'
 				sh 'docker stop bona_fide_container'
@@ -51,7 +51,7 @@ node{
                     final String url = 'http://ec2-13-235-2-41.ap-south-1.compute.amazonaws.com:9002/bona-fide/base/version'
                     final String response = sh(script: "curl -Is $url | head -1", returnStdout: true).trim()
 			if(response == "HTTP/1.1 200"){
-				final String dockerImageId = sh(script: 'docker ps -q --filter name="$oldContainerNameWithRegularExpression"',returnStdout: true)  
+				final String dockerImageId = sh(script: 'docker ps -q --filter name="^bona_fide_container_old$"',returnStdout: true)  
 				if(!dockerImageId.isEmpty()){
 					sh 'docker rm bona_fide_container_old'
 					echo 'Successfully removed the previous container' 
