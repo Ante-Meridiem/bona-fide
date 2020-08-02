@@ -7,7 +7,7 @@ node{
 	}*/
 	
 	stage('RELEASE CONFIRMATION'){
-		def inputMessage = "Please provide the RELEASE VERSION"
+		def inputMessage = "Please provide the RELEASE VERSION for Bona Fide"
 		getBuildVersion()
         	timeout(time: 30, unit: 'MINUTES') {
             		buildVersion = input(id: 'buildVersion', message: inputMessage, parameters: [
@@ -49,7 +49,7 @@ node{
 	
 	stage('DOCKER CONTAINER HEALTH CHECK'){
 		script {
-                    final String url = 'http://ec2-13-235-2-41.ap-south-1.compute.amazonaws.com:9002/home'
+                    final String url = 'http://ec2-13-235-2-41.ap-south-1.compute.amazonaws.com:9002/bona-fide/base/version'
                     final String response = sh(script: "curl -Is $url | head -1", returnStdout: true).trim()
 			if(response == "HTTP/1.1 200"){
 				final String dockerImageId = sh(script: 'docker ps -q -f name=bona_fide_container_old',returnStdout: true)  
