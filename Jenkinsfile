@@ -16,20 +16,21 @@ node{
 	}
 	
     	stage('DOCKER IMAGE BUILD'){
-		sh "docker build -f Dockerfile -t talk2linojoy/${buildVersion} ."
+		sh "docker build -f Dockerfile -t talk2linojoy/bona-fide/${buildVersion} ."
 	}
 	
 	stage('DOCKER IMAGE PUSH'){
 		withCredentials([string(credentialsId: 'docker-hub-password', variable: 'dockerHubPassword')]) {
 			sh "docker login -u talk2linojoy -p ${dockerHubPassword}"	
 		}
-		sh "docker push talk2linojoy/${buildVersion}"
+		sh "docker push talk2linojoy/bona-fide/${buildVersion}"
 	}
 	
 	stage('STOPPING RUNNING CONTAINER'){
 		script{
 			final String currentImageId = sh(script: 'docker ps -q -f name=bona_fide_container',returnStdout: true)
 			if(currentImageId != null){
+				isContainerAvailable = true
 				echo 'Stopping Current Container'
 				sh 'docker stop bona_fide_container'
 				echo 'Stopping Container : bona_fide_container'
@@ -37,15 +38,13 @@ node{
 				sh 'docker rename bona_fide_container bona_fide_container_old'
 				echo 'Renamed bona_fide_container to bona_fide_container_old'
 			}
-		}
-		
+		}	
 	}
 	
 	stage('DOCKER CONTAINER RUN'){
-		sh "docker run -d -p 9002:9002 --name bona_fide_container talk2linojoy/${buildVersion}"
+		sh "docker run -d -p 9002:9002 --name bona_fide_container talk2linojoy/bona-fide/${buildVersion}"
 		echo 'Waiting for a minute...' 
 		sleep 59
-		
 	}
 	
 	stage('DOCKER CONTAINER HEALTH CHECK'){
@@ -67,7 +66,7 @@ node{
 	}
 	
 }
-
+def isContainerAvailable
 def getBuildVersion(){
 	git credentialsId: 'bona-fide', url: 'git@github.com:Ante-Meridiem/Bona-Fide.git'
 	def masterCommit = sh(returnStdout: true, script: "git log -n 1 --pretty=format:'%h'").trim()
