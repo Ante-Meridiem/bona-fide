@@ -27,7 +27,7 @@ node{
 	
 	stage('STOPPING RUNNING CONTAINER'){
 		script{
-			final String currentImageId = sh(script: 'docker ps -q --filter name="^bona_fide_container$" --filter status=running',returnStdout: true)
+			final String currentImageId = sh(script: 'docker ps -q --filter name="^bona_fide_container$"',returnStdout: true)
 			if(!currentImageId.isEmpty()){
 				echo 'Stopping Current Container'
 				sh 'docker stop bona_fide_container'
