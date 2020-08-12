@@ -1,40 +1,31 @@
 package com.bonafide.BonaFide;
 
-import static org.springframework.http.HttpMethod.GET;
+import java.util.LinkedHashMap;
+import java.util.Map;
 
-import java.util.List;
-
-import org.json.JSONException;
-import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Bean;
+import org.springframework.boot.info.BuildProperties;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.client.RestTemplate;
 
 @RestController
 public class Index {
 
-    @Bean
-    public RestTemplate getRestTemplate(){
-        return new RestTemplate();
-    }
+    private final static String SERVICE_NAME = "Service Name";
+    private final static String BUILD_VERSION = "Build Version";
+    private final static String BUILD_TIME = "Build Time";
+    private final static String ARTIFACT = "Artifact";
 
     @Autowired
-    private RestTemplate restTemplate;
+    private BuildProperties buildProperties;
 
-    @RequestMapping("/home")
-    public String index() {
-        return "Welcome Jenkins";
-    }
-
-    @RequestMapping("/communication")
-    public String home() throws JSONException {
-        JSONObject jsonpObject = new JSONObject();
-        jsonpObject.put("Home","Nadakkane");
-        jsonpObject.put("Appurathe-ninne varunnathe",
-                restTemplate.exchange("http://localhost:9009/user-list",
-                        GET,null, List.class).getBody());
-        return jsonpObject.toString();
+    @RequestMapping("/bona-fide/base/version")
+    public Map<String, String> baseVersion() {
+        Map<String, String> baseVersionMap = new LinkedHashMap<>();
+        baseVersionMap.put(SERVICE_NAME, buildProperties.getName());
+        baseVersionMap.put(BUILD_VERSION, buildProperties.getVersion());
+        baseVersionMap.put(BUILD_TIME, buildProperties.getTime().toString());
+        baseVersionMap.put(ARTIFACT, buildProperties.getArtifact());
+        return baseVersionMap;
     }
 }
