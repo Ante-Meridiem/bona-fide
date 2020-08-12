@@ -1,10 +1,9 @@
 node{
-	//Ignoring the Build stage so as save the space
-	/*stage('CLEAN BUILD'){
-	    def mvnHome = tool name: 'Maven', type: 'maven'
-	    def mvnCmd = "${mvnHome}/bin/mvn"
-	    sh "${mvnCmd} clean package"
-	}*/
+	stage('GETTING JAR AND DOCKER'){
+		sh label: '', script: '''sudo mkdir -p target'''
+		sh label: '', script: '''sudo cp /home/ec2-user/Bona-Fide/bona-fide.jar target'''
+		sh label: '', script: 'sudo cp /home/ec2-user/Bona-Fide/Dockerfile .'
+	}
 	
 	stage('RELEASE CONFIRMATION'){
 		def inputMessage = "Please provide the RELEASE VERSION for Bona Fide"
@@ -55,18 +54,24 @@ node{
 				if(!dockerImageId.isEmpty()){
 					sh 'docker rm bona_fide_container_old'
 					echo 'Successfully removed the previous container' 
-				}
+				} 
 				echo "Deployment Successfull,Application Bona Fide is up and running in port 9002 with build version ${buildVersion}"
 			}
 			else{
-				echo 'Deployment Unsuccessfull!!!'
+				echo 'Deployment Unsuccessfull!!! Please have a look'
 			}
                 }
 	}
 	
+	stage('CLEANING UP WORKSPACE'){
+		cleanWs cleanWhenAborted: false, cleanWhenFailure: false, cleanWhenNotBuilt: false, cleanWhenUnstable: false, notFailBuild: true
+		//Removing jar file from the home/ec2-user/Bona-Fide
+		sh label: '', script: 'cd /home/ec2-user/Bona-Fide'
+		cleanWs cleanWhenAborted: false, cleanWhenFailure: false, cleanWhenNotBuilt: false, cleanWhenUnstable: false, notFailBuild: true, patterns: [[pattern: '*.jar', type: 'INCLUDE']]
+	}
+	
 }
-def containerNameWithRegularExpression = '^bona_fide_container$'
-def oldContainerNameWithRegularExpression = '^bona_fide_container_old$'
+
 def getBuildVersion(){
 	git credentialsId: 'bona-fide', url: 'git@github.com:Ante-Meridiem/Bona-Fide.git'
 	def masterCommit = sh(returnStdout: true, script: "git log -n 1 --pretty=format:'%h'").trim()
