@@ -62,14 +62,7 @@ node{
 			}
                 }
 	}
-	
-	stage('CLEANING UP WORKSPACE'){
-		cleanWs cleanWhenAborted: false, cleanWhenFailure: false, cleanWhenNotBuilt: false, cleanWhenUnstable: false, notFailBuild: true
-		//Removing jar file from the home/ec2-user/Bona-Fide
-		sh label: '', script: 'cd /home/ec2-user/Bona-Fide/'
-		cleanWs cleanWhenAborted: false, cleanWhenFailure: false, cleanWhenNotBuilt: false, cleanWhenUnstable: false, notFailBuild: true, patterns: [[pattern: '*.jar', type: 'INCLUDE']]
-	}
-	
+
 }
 
 def getBuildVersion(){
