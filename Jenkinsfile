@@ -1,10 +1,5 @@
 node{
-	stage('GETTING JAR AND DOCKER'){
-		sh label: '', script: '''sudo mkdir -p target'''
-		sh label: '', script: '''sudo cp /home/ec2-user/Bona-Fide/bona-fide.jar target'''
-		sh label: '', script: 'sudo cp /home/ec2-user/Bona-Fide/Dockerfile .'
-	}
-	
+		
 	stage('RELEASE CONFIRMATION'){
 		def inputMessage = "Please provide the RELEASE VERSION for Bona Fide"
 		getBuildVersion()
@@ -12,6 +7,12 @@ node{
             		buildVersion = input(id: 'buildVersion', message: inputMessage, parameters: [
                     	[$class: 'TextParameterDefinition', defaultValue: env.BUILD_VERSION , description: 'Build Version', name: 'Release Version']])
         	}
+	}
+	
+	stage('GETTING JAR AND DOCKER'){
+		sh label: '', script: '''sudo mkdir -p target'''
+		sh label: '', script: '''sudo cp /home/ec2-user/Bona-Fide/bona-fide.jar target'''
+		sh label: '', script: 'sudo cp /home/ec2-user/Bona-Fide/Dockerfile .'
 	}
 	
     	stage('DOCKER IMAGE BUILD'){
