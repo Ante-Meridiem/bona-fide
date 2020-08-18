@@ -42,7 +42,7 @@ pipeline{
       }
     }
 
-		stage('HALT KETTLE'){
+    stage('HALT KETTLE'){
       steps{
         script{
           groovy.stopRunningContainer()
@@ -50,7 +50,7 @@ pipeline{
       }
     }
 
-		stage('ACTUATE KETTLE'){
+    stage('ACTUATE KETTLE'){
       steps{
         script{
           groovy.runContainer()
@@ -58,22 +58,24 @@ pipeline{
       }
     }
 
-		stage('PROBE KETTLE'){
+   stage('PROBE KETTLE'){
       steps{
         script{
           groovy.performHealthCheck()
         }
       }
     }
-
-		stage('REPORT')
-			when{
-				expression{
-					APPLICATION_RUNNING_STATUS == true
-				}
-			}
-			steps{
-				echo "Deployment Successfull,Application Bona Fide is up and running in port 9002 with build version ${buildVersion}"
-			}
+	
+   stage('REPORT'){
+      when{
+	expression{
+	  APPLICATION_RUNNING_STATUS == true
+	}
+     }
+     steps{
+	echo "Deployment Successfull,Application Bona Fide is up and running in port 9002 with build version ${buildVersion}"
+     }
+   }
+		
   }
 }
