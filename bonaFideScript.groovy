@@ -29,7 +29,7 @@ def fecthJarAndDockerFile() {
 def buildDockerImage() {
     def dockerImgBuildError = 'Error while creating docker image'
     try {
-        sh "docker build -f Dockerfile -t docker4bonafide/bona-fide/${buildVersion} ."
+        sh "docker build -f Dockerfile -t talk2linojoy/bona-fide/${buildVersion} ."
     }
     catch (Exception e) {
         error "${dockerImgBuildError} ${e.getMessage()}"
