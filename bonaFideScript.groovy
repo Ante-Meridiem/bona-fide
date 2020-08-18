@@ -39,7 +39,7 @@ def buildDockerImage() {
 def pushDockerImage() {
     def dockerImagePushError = 'Error while pushing docker image'
     withCredentials([string(credentialsId: 'docker-hub-password', variable: 'dockerHubPassword')]) {
-			sh "docker login -u talk2linojoy -p ${dockerHubPassword}"	
+			sh "docker login -u talk2linojoy -p ${dockerHubPassword} docker.io"	
 		}
     try {
         sh "docker push talk2linojoy/bona-fide/${buildVersion}"
