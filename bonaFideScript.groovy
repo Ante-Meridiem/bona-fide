@@ -29,7 +29,7 @@ def fecthJarAndDockerFile() {
 def buildDockerImage() {
     def dockerImgBuildError = 'Error while creating docker image'
     try {
-        sh "docker build -f Dockerfile -t talk2linojoy/bona-fide/${buildVersion} ."
+        sh "docker build -f Dockerfile -t docker4bonafide/${buildVersion} ."
     }
     catch (Exception e) {
         error "${dockerImgBuildError} ${e.getMessage()}"
@@ -38,11 +38,11 @@ def buildDockerImage() {
 
 def pushDockerImage() {
     def dockerImagePushError = 'Error while pushing docker image'
-    withCredentials([string(credentialsId: 'docker-hub-password', variable: 'dockerHubPassword')]) {
-			sh "docker login -u talk2linojoy -p ${dockerHubPassword} docker.io"	
-		}
+    withCredentials([string(credentialsId: 'docker-hub-password-bona-fide', variable: 'bonaFideDockerHubPassword')]) {
+        sh "docker login -u docker4bonafide -p ${bonaFideDockerHubPassword}"
+    }
     try {
-        sh "docker push talk2linojoy/bona-fide/${buildVersion}"
+        sh "docker push docker4bonafide/${buildVersion}:latest"
     }
     catch (Exception e) {
         error "${dockerImagePushError} ${e.getMessage()}"
@@ -57,7 +57,7 @@ def runContainer(){
     def dockerContainerRunError = 'Error while running the container'
     sshagent(['bonaFideDeploymentAccess']) {
         try{
-            sh "docker run -d -p 9002:9002 --name bona_fide_container talk2linojoy/bona-fide/${buildVersion}"
+            sh "docker run -d -p 9002:9002 --name bona_fide_container docker4bonafide/${buildVersion}:latest"
         }
         catch(Exception e){
             error "${dockerContainerRunError} ${e.getMessage()}"
