@@ -55,7 +55,7 @@ def stopRunningContainer(){
 
 def runContainer(){
     def dockerContainerRunError = 'Error while running the container'
-    def dockerRunCommand = 'docker run -d -p 9002:9002 --name bona_fide_container docker4bonafide/${buildVersion}:latest'
+    def dockerRunCommand = 'docker run -d -p 9002:9002 --name bona_fide_container docker4bonafide/${buildVersion}'
     sshagent(['bonaFideDeploymentAccess']) {
         try{
             sh "ssh -o StrictHostKeyChecking=no ec2-user@13.126.97.24 ${dockerRunCommand}"
