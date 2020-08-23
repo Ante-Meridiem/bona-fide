@@ -1,83 +1,86 @@
 def getReleaseConfirmation() {
-    def inputMessage = "Please provide the release version for Bona Fide"
-    getBuildVersion()
-    timeout(time: 30, unit: 'MINUTES') {
-        buildVersion = input(id: 'buildVersion', message: inputMessage, parameters: [
-                [$class: 'TextParameterDefinition', defaultValue: env.BUILD_VERSION, description: 'Build Version', name: 'Release Version']])
-    }
+  def inputMessage = "Please provide the release version for Bona Fide"
+  getBuildVersion()
+  timeout(time: 30, unit: 'MINUTES') {
+    buildVersion = input(id: 'buildVersion', message: inputMessage, parameters: [[$class: 'TextParameterDefinition', defaultValue: env.BUILD_VERSION, description: 'Build Version', name: 'Release Version']])
+  }
 }
 
 def getBuildVersion() {
-    git credentialsId: 'bona-fide', url: 'git@github.com:Ante-Meridiem/Bona-Fide.git'
-    def masterCommit = sh(returnStdout: true, script: "git log -n 1 --pretty=format:'%h'").trim()
-    def currentDate = sh(returnStdout: true, script: 'date +%Y-%m-%d').trim()
-    env.BUILD_VERSION = currentDate + "-" + masterCommit
+  git credentialsId: 'bona-fide',
+  url: 'git@github.com:Ante-Meridiem/Bona-Fide.git'
+  def masterCommit = sh(returnStdout: true, script: "git log -n 1 --pretty=format:'%h'").trim()
+  def currentDate = sh(returnStdout: true, script: 'date +%Y-%m-%d').trim()
+  env.BUILD_VERSION = currentDate + "-" + masterCommit
 }
 
 def fecthJarAndDockerFile() {
-    def fetchErrorMessage = 'Error while fetching the Jar and dockerfile'
-    try {
-        sh label: 'createTargetDirectory', script: '''sudo mkdir -p target'''
-        sh label: 'copyJarFile', script: '''sudo cp /home/ec2-user/Bona-Fide/bona-fide.jar target'''
-        sh label: 'copyDockerFile', script: 'sudo cp /home/ec2-user/Bona-Fide/Dockerfile .'
-    }
-    catch (Exception e) {
-        error "${fetchErrorMessage} ${e.getMessage()}"
-    }
+  def fetchErrorMessage = 'Error while fetching the Jar and dockerfile'
+  try {
+    sh label: 'createTargetDirectory',
+    script: '''sudo mkdir -p target'''
+    sh label: 'copyJarFile',
+    script: '''sudo cp /home/ec2-user/Bona-Fide/bona-fide.jar target'''
+    sh label: 'copyDockerFile',
+    script: 'sudo cp /home/ec2-user/Bona-Fide/Dockerfile .'
+  }
+  catch(Exception e) {
+    error "${fetchErrorMessage} ${e.getMessage()}"
+  }
 }
 
 def buildDockerImage() {
-    def dockerImgBuildError = 'Error while creating docker image'
-    try {
-        sh "docker build -f Dockerfile -t docker4bonafide/${buildVersion} ."
-    }
-    catch (Exception e) {
-        error "${dockerImgBuildError} ${e.getMessage()}"
-    }
+  def dockerImgBuildError = 'Error while creating docker image'
+  try {
+    sh "docker build -f Dockerfile -t docker4bonafide/${buildVersion} ."
+  }
+  catch(Exception e) {
+    error "${dockerImgBuildError} ${e.getMessage()}"
+  }
 }
 
 def pushDockerImage() {
-    def dockerImagePushError = 'Error while pushing docker image'
-    withCredentials([string(credentialsId: 'docker-hub-password-bona-fide', variable: 'bonaFideDockerHubPassword')]) {
-        sh "docker login -u docker4bonafide -p ${bonaFideDockerHubPassword}"
-    }
-    try {
-        sh "docker push docker4bonafide/${buildVersion}:latest"
-    }
-    catch (Exception e) {
-        error "${dockerImagePushError} ${e.getMessage()}"
-    }
+  def dockerImagePushError = 'Error while pushing docker image'
+  withCredentials([string(credentialsId: 'docker-hub-password-bona-fide', variable: 'bonaFideDockerHubPassword')]) {
+    sh "docker login -u docker4bonafide -p ${bonaFideDockerHubPassword}"
+  }
+  try {
+    sh "docker push docker4bonafide/${buildVersion}:latest"
+  }
+  catch(Exception e) {
+    error "${dockerImagePushError} ${e.getMessage()}"
+  }
 }
 
-def stopRunningContainer(){
-    def stoppingContainerErrorMessage = 'Error occured while stopping running container'
-    def renamingContainerErrorMessage = 'Error occured while renaming container'
-     sshagent(['bonaFideDeploymentAccess']) {
-         final String currentImageId = sh(script: 'ssh -o StrictHostKeyChecking=no ec2-user@13.126.97.24 docker ps -q -f name="^bona_fide_container$"',returnStdout: true)'
+def stopRunningContainer() {
+  def stoppingContainerErrorMessage = 'Error occured while stopping running container'
+  def renamingContainerErrorMessage = 'Error occured while renaming container'
+  sshagent(['bonaFideDeploymentAccess']) {
+    final String currentImageId = sh(script: 'ssh -o StrictHostKeyChecking=no ec2-user@13.126.97.24 docker ps -q -f name="^bona_fide_container$"', returnStdout: true)'
          if(!currentImageId.isEmpty()){
-             echo 'Stopping Current Container'
+             echo 'Stopping Current Container '
              try{
-				sh 'docker stop bona_fide_container'
+		sh 'ssh - o StrictHostKeyChecking = no ec2 - user@13.126.97.24 docker stop bona_fide_container '
              }
              catch(Exception e){
                 error "${stoppingContainerErrorMessage} ${e.getMessage()}"
              }
-			 echo 'Renaming Current Container'
+	     echo 'Renaming Current Container '
              try{
-                sh 'docker rename bona_fide_container bona_fide_container_old'
+                sh 'ssh - o StrictHostKeyChecking = no ec2 - user@13.126.97.24 docker rename bona_fide_container bona_fide_container_old '
              }
              catch(Exception e){
                  error "${renamingContainerErrorMessage} ${e.getMessage()}" 
              }
-			 echo 'Renamed bona_fide_container to bona_fide_container_old'
+	     echo 'Renamed bona_fide_container to bona_fide_container_old '
          }
      }
 }
 
 def runContainer(){
-    def dockerContainerRunError = 'Error while running the container'
+    def dockerContainerRunError = 'Error while running the container '
     def dockerRunCommand = "docker run -d -p 9002:9002 --name bona_fide_container docker4bonafide/${buildVersion}"
-    sshagent(['bonaFideDeploymentAccess']) {
+    sshagent(['bonaFideDeploymentAccess ']) {
         try{
             sh "ssh -o StrictHostKeyChecking=no ec2-user@13.126.97.24 ${dockerRunCommand}"
         }
@@ -89,23 +92,42 @@ def runContainer(){
     }
 }
 
-def showDeploymentStatus(){
-    def deploymentSuccessMessage = "Deployment Successfull,Application Bona Fide is up and running in port 9002 with build version ${buildVersion}"
-    def deploymentFailureMessage = 'Deplyoment Unsuccessfull...Please have a look'
-    if(APPLICATION_RUNNING_STATUS == true){
-        echo "${deploymentSuccessMessage}"
-    }
-    else{
-        echo "${deploymentFailureMessage}"
-    }
-}
-
 def performHealthCheck(){
     def httpResponseStatus = "HTTP/1.1 200"
-    final String url = 'http://ec2-13-126-97-24.ap-south-1.compute.amazonaws.com:9002/bona-fide/base/version'
+    def deploymentFailureMessage = 'Deplyoment Unsuccessfull...Please have a look '
+    final String url = 'http: //ec2-13-126-97-24.ap-south-1.compute.amazonaws.com:9002/bona-fide/base/version'
     final String response = sh(script: "curl -Is $url | head -1", returnStdout: true).trim()
-    if(response == "${httpResponseStatus}"){
-        APPLICATION_RUNNING_STATUS = true
+    if (response == "${httpResponseStatus}") {
+      APPLICATION_RUNNING_STATUS = true
+    }
+    else {
+      error "${deploymentFailureMessage}"
+    }
+  }
+
+def performCleanSlateProtocol() {
+    if (APPLICATION_RUNNING_STATUS == true) {
+      sshagent(['bonaFideDeploymentAccess']) {      
+        final String currentImageId = sh(script: 'ssh -o StrictHostKeyChecking=no ec2-user@13.126.97.24 docker ps -q -f name="^bona_fide_container_old$"', returnStdout: true)'
+		def containerRemovalErrorMessage = 'Error while removing bona_fide_container_old '
+		def containerImageRemovalErrorMessage = 'Error while removing bona_fide_container_old docker Image '
+		if(!containerImageId.isEmpty()){
+			try{
+				sh 'ssh - o StrictHostKeyChecking = no ec2 - user@13.126.97.24 docker rm bona_fide_container_old '
+				echo 'Successfully removed the previous container ' 
+			}
+			catch(Exception e){
+				echo "${containerRemovalErrorMessage} ${e.getMessage()}"
+			}
+			try{
+				sh 'ssh - o StrictHostKeyChecking = no ec2 - user@13.126.97.24 docker rmi - f $(docker inspect bona_fide_container_old--format = \'{{.Image}}\')'
+                		echo 'Successfully removed the previous container docker Image'
+            		}
+            		catch(Exception e) {
+            			echo "${containerImageRemovalErrorMessage} ${e.getMessage()}"
+            		}
+        	}
+     }
     }
 }
 
