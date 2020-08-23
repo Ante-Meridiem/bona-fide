@@ -95,7 +95,7 @@ def runContainer(){
 def performHealthCheck(){
     def httpResponseStatus = "HTTP/1.1 200"
     def deploymentFailureMessage = 'Deplyoment Unsuccessfull...Please have a look '
-    final String url = 'http: //ec2-13-126-97-24.ap-south-1.compute.amazonaws.com:9002/bona-fide/base/version'
+    final String url = 'http://ec2-13-126-97-24.ap-south-1.compute.amazonaws.com:9002/bona-fide/base/version'
     final String response = sh(script: "curl -Is $url | head -1", returnStdout: true).trim()
     if (response == "${httpResponseStatus}") {
       APPLICATION_RUNNING_STATUS = true
