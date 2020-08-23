@@ -108,7 +108,7 @@ def performHealthCheck(){
 def performCleanSlateProtocol() {
     if (APPLICATION_RUNNING_STATUS == true) {
       sshagent(['bonaFideDeploymentAccess']) {      
-        final String currentImageId = sh(script: 'ssh -o StrictHostKeyChecking=no ec2-user@13.126.97.24 docker ps -q -f name="^bona_fide_container_old$"', returnStdout: true)'
+        final String currentImageId = sh(script: 'ssh -o StrictHostKeyChecking=no ec2-user@13.126.97.24 docker ps -q -f name="^bona_fide_container_old$"', returnStdout: true)
 		def containerRemovalErrorMessage = 'Error while removing bona_fide_container_old '
 		def containerImageRemovalErrorMessage = 'Error while removing bona_fide_container_old docker Image '
 		if(!containerImageId.isEmpty()){
