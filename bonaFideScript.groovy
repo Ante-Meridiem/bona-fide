@@ -72,10 +72,10 @@ def showDeploymentStatus(){
     def deploymentSuccessMessage = "Deployment Successfull,Application Bona Fide is up and running in port 9002 with build version ${buildVersion}"
     def deploymentFailureMessage = 'Deplyoment Unsuccessfull...Please have a look'
     if(APPLICATION_RUNNING_STATUS == true){
-        echo "${deploymentSuccessMessage}
+        echo "${deploymentSuccessMessage}"
     }
     else{
-        echo ""${deploymentFailureMessage}
+        echo "${deploymentFailureMessage}"
     }
 }
 
