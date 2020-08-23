@@ -128,8 +128,8 @@ def performCleanSlateProtocol() {
     }
     dir('/var/lib/jenkins/workspace') {
 	try{
-		sh(script:'rm -rf Bona-Fide')
-    		sh(script:'rm -rf Bona-Fide@tmp')
+		sh(script:'sudo rm -rf Bona-Fide')
+    		sh(script:'sudo rm -rf Bona-Fide@tmp')
 	}
 	catch(Exception e){
 		echo 'Error while deleting the working directory'
