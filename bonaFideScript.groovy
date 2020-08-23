@@ -50,7 +50,28 @@ def pushDockerImage() {
 }
 
 def stopRunningContainer(){
-    echo 'Hi'
+    def stoppingContainerErrorMessage = 'Error occured while stopping running container'
+    def renamingContainerErrorMessage = 'Error occured while renaming container'
+     sshagent(['bonaFideDeploymentAccess']) {
+         final String currentImageId = sh(script: 'ssh -o StrictHostKeyChecking=no ec2-user@13.126.97.24 docker ps -q -f name="^bona_fide_container$"',returnStdout: true)'
+         if(!currentImageId.isEmpty()){
+             echo 'Stopping Current Container'
+             try{
+				sh 'docker stop bona_fide_container'
+             }
+             catch(Exception e){
+                error "${stoppingContainerErrorMessage} ${e.getMessage()}"
+             }
+			 echo 'Renaming Current Container'
+             try{
+                sh 'docker rename bona_fide_container bona_fide_container_old'
+             }
+             catch(Exception e){
+                 error "${renamingContainerErrorMessage} ${e.getMessage()}" 
+             }
+			 echo 'Renamed bona_fide_container to bona_fide_container_old'
+         }
+     }
 }
 
 def runContainer(){
