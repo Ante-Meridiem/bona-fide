@@ -120,7 +120,7 @@ def performCleanSlateProtocol() {
 				echo "${containerRemovalErrorMessage} ${e.getMessage()}"
 			}
 			try{
-				sh 'ssh -o StrictHostKeyChecking=no ec2-user@13.126.97.24 docker rmi - f $(docker inspect bona_fide_container_old--format = \'{{.Image}}\')'
+				sh 'ssh -o StrictHostKeyChecking=no ec2-user@13.126.97.24 docker rmi -f $(docker inspect bona_fide_container_old --format=\'{{.Image}}\')'
                 		echo 'Successfully removed the previous container docker Image'
             		}
             		catch(Exception e) {
@@ -129,6 +129,15 @@ def performCleanSlateProtocol() {
         	}
      }
     }
+	try{
+		sh(script: 'cd ..')
+		sh(script: 'rm -rf Bona-Fide')
+		sh(script: 'rm -rf Bona-Fide@tmp')
+	}
+	catch(Exception e){
+		echo 'Error while deleting workspaces'
+	}
+	
 }
 
 return this
