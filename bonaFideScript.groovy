@@ -55,15 +55,27 @@ def stopRunningContainer(){
 
 def runContainer(){
     def dockerContainerRunError = 'Error while running the container'
+    def dockerRunCommand = 'docker run -d -p 9002:9002 --name bona_fide_container docker4bonafide/${buildVersion}:latest'
     sshagent(['bonaFideDeploymentAccess']) {
         try{
-            sh "docker run -d -p 9002:9002 --name bona_fide_container docker4bonafide/${buildVersion}:latest"
+            sh "ssh -o StrictHostKeyChecking=no ec2-user@13.126.97.24 ${dockerRunCommand}"
         }
         catch(Exception e){
             error "${dockerContainerRunError} ${e.getMessage()}"
         }
         echo 'Waiting for a minute...'
         sleep 59
+    }
+}
+
+def showDeploymentStatus(){
+    def deploymentSuccessMessage = "Deployment Successfull,Application Bona Fide is up and running in port 9002 with build version ${buildVersion}"
+    def deploymentFailureMessage = 'Deplyoment Unsuccessfull...Please have a look'
+    if(APPLICATION_RUNNING_STATUS == true){
+        echo "${deploymentSuccessMessage}
+    }
+    else{
+        echo ""${deploymentFailureMessage}
     }
 }
 
