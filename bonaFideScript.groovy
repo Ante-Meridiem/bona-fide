@@ -58,16 +58,16 @@ def stopRunningContainer() {
   sshagent(['bonaFideDeploymentAccess']) {
     final String currentImageId = sh(script: 'ssh -o StrictHostKeyChecking=no ec2-user@13.126.97.24 docker ps -q -f name="^bona_fide_container$"', returnStdout: true)
          if(!currentImageId.isEmpty()){
-             echo 'Stopping Current Container '
+             echo 'Stopping Current Container'
              try{
-		sh 'ssh - o StrictHostKeyChecking = no ec2 - user@13.126.97.24 docker stop bona_fide_container '
+		sh 'ssh -o StrictHostKeyChecking=no ec2-user@13.126.97.24 docker stop bona_fide_container '
              }
              catch(Exception e){
                 error "${stoppingContainerErrorMessage} ${e.getMessage()}"
              }
 	     echo 'Renaming Current Container '
              try{
-                sh 'ssh - o StrictHostKeyChecking = no ec2 - user@13.126.97.24 docker rename bona_fide_container bona_fide_container_old '
+                sh 'ssh -o StrictHostKeyChecking=no ec2-user@13.126.97.24 docker rename bona_fide_container bona_fide_container_old '
              }
              catch(Exception e){
                  error "${renamingContainerErrorMessage} ${e.getMessage()}" 
@@ -113,14 +113,14 @@ def performCleanSlateProtocol() {
 		def containerImageRemovalErrorMessage = 'Error while removing bona_fide_container_old docker Image '
 		if(!containerImageId.isEmpty()){
 			try{
-				sh 'ssh - o StrictHostKeyChecking = no ec2 - user@13.126.97.24 docker rm bona_fide_container_old '
+				sh 'ssh -o StrictHostKeyChecking=no ec2-user@13.126.97.24 docker rm bona_fide_container_old '
 				echo 'Successfully removed the previous container ' 
 			}
 			catch(Exception e){
 				echo "${containerRemovalErrorMessage} ${e.getMessage()}"
 			}
 			try{
-				sh 'ssh - o StrictHostKeyChecking = no ec2 - user@13.126.97.24 docker rmi - f $(docker inspect bona_fide_container_old--format = \'{{.Image}}\')'
+				sh 'ssh -o StrictHostKeyChecking=no ec2-user@13.126.97.24 docker rmi - f $(docker inspect bona_fide_container_old--format = \'{{.Image}}\')'
                 		echo 'Successfully removed the previous container docker Image'
             		}
             		catch(Exception e) {
