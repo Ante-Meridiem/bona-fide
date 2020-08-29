@@ -86,5 +86,8 @@ pipeline {
         failure{
             slackSend channel: '#bona-fide-production-deployment', color: 'danger', message: "Deployment Failed for Service: ${env.JOB_NAME} ${env.BUILD_NUMBER} (<${env.JENKINS_BUILD_URL}|Open>)", teamDomain: 'bona-fide-co', tokenCredentialId: 'slackIntegrationIdForSendingNotification'
         }
+        aborted{
+            slackSend channel: '#bona-fide-production-deployment', color: 'warning', message: "Deployment Aborted for Service: ${env.JOB_NAME} ${env.BUILD_NUMBER} (<${env.JENKINS_BUILD_URL}|Open>)", teamDomain: 'bona-fide-co', tokenCredentialId: 'slackIntegrationIdForSendingNotification'
+        }
     }
  }
