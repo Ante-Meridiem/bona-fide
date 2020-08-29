@@ -74,16 +74,13 @@ pipeline {
       }
     }
 
-    stage('REPORT') {
-      when {
-        expression {
-          APPLICATION_RUNNING_STATUS == true
-        }
-      }
-      steps {
-        echo "*****Deployment Successfull***** Application Bona Fide is up and running in port 9002 with build version ${buildVersion}"
-      }
-    }
-
   }
+  post{
+        success{
+            slackSend channel: '#demo', color: 'good', message: 'Deployment Successfull... Bona Fide is UP & RUNNING on port 9002 ', teamDomain: 'bona-fide-co', tokenCredentialId: 'slackIntegrationIdForSendingNotification'            
+        }
+        failure{
+            slackSend channel: '#demo', color: 'danger', message: 'Deployment Failed!!! Kindly have a look', teamDomain: 'bona-fide-co', tokenCredentialId: 'slackIntegrationIdForSendingNotification'
+        }
+    }
  }
