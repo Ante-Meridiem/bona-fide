@@ -77,10 +77,10 @@ pipeline {
   }
   post{
         success{
-            slackSend channel: '#demo', color: 'good', message: 'Deployment Successfull... Bona Fide is UP & RUNNING on port 9002 ', teamDomain: 'bona-fide-co', tokenCredentialId: 'slackIntegrationIdForSendingNotification'            
+            slackSend channel: '#bona-fide-production-deployment', color: 'good', message: 'Deployment Successfull... Bona Fide is UP & RUNNING on port 9002 ', teamDomain: 'bona-fide-co', tokenCredentialId: 'slackIntegrationIdForSendingNotification'            
         }
         failure{
-            slackSend channel: '#demo', color: 'danger', message: 'Deployment Failed!!! Kindly have a look', teamDomain: 'bona-fide-co', tokenCredentialId: 'slackIntegrationIdForSendingNotification'
+            slackSend channel: '#bona-fide-production-deployment', color: 'danger', message: 'Deployment Failed!!! Kindly have a look', teamDomain: 'bona-fide-co', tokenCredentialId: 'slackIntegrationIdForSendingNotification'
         }
     }
  }
