@@ -9,7 +9,7 @@ def getReleaseConfirmation() {
 
 def getBuildVersion() {
   git credentialsId: 'bona-fide',
-  url: 'git@github.com:Ante-Meridiem/Bona-Fide.git'
+  url: 'git@github.com:Ante-Meridiem/bona-fide.git'
   def masterCommit = sh(returnStdout: true, script: "git log -n 1 --pretty=format:'%h'").trim()
   def currentDate = sh(returnStdout: true, script: 'date +%Y-%m-%d').trim()
   env.BUILD_VERSION = currentDate + "-" + masterCommit
@@ -42,7 +42,7 @@ def buildDockerImage() {
 
 def pushDockerImage() {
   def dockerImagePushError = 'Error while pushing docker image'
-  withCredentials([string(credentialsId: 'docker-hub-password-bona-fide', variable: 'bonaFideDockerHubPassword')]) {
+  withCredentials([string(credentialsId: 'dockerhubpwd', variable: 'dockerHubPassword')]) {
     sh "docker login -u docker4bonafide -p ${bonaFideDockerHubPassword}"
   }
   try {
@@ -56,7 +56,7 @@ def pushDockerImage() {
 def stopRunningContainer() {
   def stoppingContainerErrorMessage = 'Error occured while stopping running container'
   def renamingContainerErrorMessage = 'Error occured while renaming container'
-  sshagent(['bonaFideDeploymentAccess']) {
+  sshagent(['DeploymentInstanceAccess']) {
     final String currentImageId = sh(script: 'ssh -o StrictHostKeyChecking=no ec2-user@13.126.97.24 docker ps -q -f name="^bona_fide_container$"', returnStdout: true)
          if(!currentImageId.isEmpty()){
              echo 'Stopping Current Container'
@@ -129,8 +129,8 @@ def performCleanSlateProtocol() {
     }
     dir('/var/lib/jenkins/workspace') {
 	try{
-		sh(script:'sudo rm -rf Bona-Fide')
-    		sh(script:'sudo rm -rf Bona-Fide@tmp')
+		sh(script:'sudo rm -rf bona-fide')
+    		sh(script:'sudo rm -rf bona-fide@tmp')
 	}
 	catch(Exception e){
 		echo 'Error while deleting the working directory'
