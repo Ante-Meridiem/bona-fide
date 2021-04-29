@@ -1,6 +1,5 @@
 def getReleaseConfirmation() {
   //slackSend channel: "#bona-fide-production-deployment", message: "Deployment Started for Service: ${env.JOB_NAME} ${env.BUILD_NUMBER} (<${env.JENKINS_BUILD_URL}|Open>)",teamDomain: 'bona-fide-co', tokenCredentialId: 'slackIntegrationIdForSendingNotification'
-  echo ${GIT_COMMIT}
   def inputMessage = "Please provide the release version for Bona Fide"
   getBuildVersion()
   timeout(time: 30, unit: 'MINUTES') {
@@ -9,8 +8,6 @@ def getReleaseConfirmation() {
 }
 
 def getBuildVersion() {
-  git credentialsId: 'bona-fide',
-  url: 'git@github.com:Ante-Meridiem/bona-fide.git'
   def masterCommit = sh(returnStdout: true, script: "git log -n 1 --pretty=format:'%h'").trim()
   def currentDate = sh(returnStdout: true, script: 'date +%Y-%m-%d').trim()
   env.BUILD_VERSION = currentDate + "-" + masterCommit
