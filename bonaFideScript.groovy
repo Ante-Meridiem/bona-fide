@@ -31,7 +31,7 @@ def fecthJarAndDockerFile() {
 def buildDockerImage() {
   def dockerImgBuildError = 'Error while creating docker image'
   try {
-    sh "docker build -f Dockerfile -t docker4bonafide/${buildVersion} ."
+    sh "sudo docker build -f Dockerfile -t docker4bonafide/${buildVersion} ."
   }
   catch(Exception e) {
     error "${dockerImgBuildError} ${e.getMessage()}"
@@ -41,10 +41,10 @@ def buildDockerImage() {
 def pushDockerImage() {
   def dockerImagePushError = 'Error while pushing docker image'
   withCredentials([string(credentialsId: 'dockerhubpwd', variable: 'dockerHubPassword')]) {
-    sh "docker login -u docker4bonafide -p ${bonaFideDockerHubPassword}"
+    sh "sudo docker login -u docker4bonafide -p ${bonaFideDockerHubPassword}"
   }
   try {
-    sh "docker push docker4bonafide/${buildVersion}:latest"
+    sh "sudo docker push docker4bonafide/${buildVersion}:latest"
   }
   catch(Exception e) {
     error "${dockerImagePushError} ${e.getMessage()}"
@@ -55,18 +55,18 @@ def stopRunningContainer() {
   def stoppingContainerErrorMessage = 'Error occured while stopping running container'
   def renamingContainerErrorMessage = 'Error occured while renaming container'
   sshagent(['DeploymentInstanceAccess']) {
-    final String currentImageId = sh(script: 'ssh -o StrictHostKeyChecking=no ec2-user@13.126.97.24 docker ps -q -f name="^bona_fide_container$"', returnStdout: true)
+    final String currentImageId = sh(script: 'ssh -o StrictHostKeyChecking=no ec2-user@13.126.97.24 sudo docker ps -q -f name="^bona_fide_container$"', returnStdout: true)
          if(!currentImageId.isEmpty()){
              echo 'Stopping Current Container'
              try{
-		sh 'ssh -o StrictHostKeyChecking=no ec2-user@13.126.97.24 docker stop bona_fide_container '
+		sh 'ssh -o StrictHostKeyChecking=no ec2-user@13.126.97.24 sudo docker stop bona_fide_container '
              }
              catch(Exception e){
                 error "${stoppingContainerErrorMessage} ${e.getMessage()}"
              }
 	     echo 'Renaming Current Container '
              try{
-                sh 'ssh -o StrictHostKeyChecking=no ec2-user@13.126.97.24 docker rename bona_fide_container bona_fide_container_old '
+                sh 'ssh -o StrictHostKeyChecking=no ec2-user@13.126.97.24 sudo docker rename bona_fide_container bona_fide_container_old '
              }
              catch(Exception e){
                  error "${renamingContainerErrorMessage} ${e.getMessage()}" 
@@ -78,7 +78,7 @@ def stopRunningContainer() {
 
 def runContainer(){
     def dockerContainerRunError = 'Error while running the container '
-    def dockerRunCommand = "docker run -d -p 9002:9002 --name bona_fide_container docker4bonafide/${buildVersion}"
+    def dockerRunCommand = "sudo docker run -d -p 9002:9002 --name bona_fide_container docker4bonafide/${buildVersion}"
     sshagent(['bonaFideDeploymentAccess ']) {
         try{
             sh "ssh -o StrictHostKeyChecking=no ec2-user@13.126.97.24 ${dockerRunCommand}"
@@ -109,15 +109,15 @@ def performCleanSlateProtocol() {
     def containerRemovalErrorMessage = 'Error while removing containers'
     if (APPLICATION_RUNNING_STATUS == true) {
 	    try{
-	    	sh 'docker image prune -a -f'
+	    	sh 'sudo docker image prune -a -f'
 	    }
 	    catch(Exception e){
 	    	echo "${imageRemovalErrorMessage} ${e.getMessage()}"
 	    }
       sshagent(['bonaFideDeploymentAccess']) {      
 	try{
-		sh 'ssh -o StrictHostKeyChecking=no ec2-user@13.126.97.24 docker system prune -f'
-		sh 'ssh -o StrictHostKeyChecking=no ec2-user@13.126.97.24 docker image prune -a -f'
+		sh 'ssh -o StrictHostKeyChecking=no ec2-user@13.126.97.24 sudo docker system prune -f'
+		sh 'ssh -o StrictHostKeyChecking=no ec2-user@13.126.97.24 sudo docker image prune -a -f'
 		echo 'Successfully removed all non-functional containers' 
 	}
 	catch(Exception e){
