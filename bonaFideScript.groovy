@@ -41,7 +41,7 @@ def buildDockerImage() {
 def pushDockerImage() {
   def dockerImagePushError = 'Error while pushing docker image'
   withCredentials([string(credentialsId: 'dockerhubpwd', variable: 'dockerHubPassword')]) {
-    sh "sudo docker login -u docker4bonafide -p ${bonaFideDockerHubPassword}"
+    sh "sudo docker login -u docker4bonafide -p ${dockerHubPassword}"
   }
   try {
     sh "sudo docker push docker4bonafide/${buildVersion}:latest"
