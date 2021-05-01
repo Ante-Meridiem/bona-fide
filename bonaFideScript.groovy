@@ -19,7 +19,7 @@ def fecthJarAndDockerFile() {
     sh label: 'createTargetDirectory',
     script: '''mkdir -p target'''
     sh label: 'copyJarFile',
-    script: '''sudo cp /home/ec2-user/bona-fide/bona-fide.jar /target'''
+    script: '''sudo cp /home/ec2-user/bona-fide/bona-fide.jar target'''
     sh label: 'copyDockerFile',
     script: 'sudo cp /home/ec2-user/bona-fide/Dockerfile .'
   }
