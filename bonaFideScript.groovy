@@ -17,11 +17,11 @@ def fecthJarAndDockerFile() {
   def fetchErrorMessage = 'Error while fetching the Jar and dockerfile'
   try {
     sh label: 'createTargetDirectory',
-    script: '''sudo mkdir -p target'''
+    script: '''mkdir -p target'''
     sh label: 'copyJarFile',
-    script: '''sudo cp /home/ec2-user/Bona-Fide/bona-fide.jar target'''
+    script: '''sudo cp /home/ec2-user/bona-fide/bona-fide.jar /target'''
     sh label: 'copyDockerFile',
-    script: 'sudo cp /home/ec2-user/Bona-Fide/Dockerfile .'
+    script: 'sudo cp /home/ec2-user/bona-fide/Dockerfile .'
   }
   catch(Exception e) {
     error "${fetchErrorMessage} ${e.getMessage()}"
