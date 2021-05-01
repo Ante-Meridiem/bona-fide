@@ -79,7 +79,7 @@ def stopRunningContainer() {
 def runContainer(){
     def dockerContainerRunError = 'Error while running the container '
     def dockerRunCommand = "sudo docker run -d -p 9002:9002 --name bona_fide_container docker4bonafide/${buildVersion}"
-    sshagent(['bonaFideDeploymentAccess ']) {
+    sshagent(['DeploymentInstanceAccess ']) {
         try{
             sh "ssh -o StrictHostKeyChecking=no ec2-user@13.126.97.24 ${dockerRunCommand}"
         }
@@ -114,7 +114,7 @@ def performCleanSlateProtocol() {
 	    catch(Exception e){
 	    	echo "${imageRemovalErrorMessage} ${e.getMessage()}"
 	    }
-      sshagent(['bonaFideDeploymentAccess']) {      
+      sshagent(['DeploymentInstanceAccess']) {      
 	try{
 		sh 'ssh -o StrictHostKeyChecking=no ec2-user@13.126.97.24 sudo docker system prune -f'
 		sh 'ssh -o StrictHostKeyChecking=no ec2-user@13.126.97.24 sudo docker image prune -a -f'
